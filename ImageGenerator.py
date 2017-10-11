@@ -28,6 +28,9 @@ TRANSLATION_X_UPPER = 5.0
 TRANSLATION_Y_LOWER = 2.5
 TRANSLATION_Y_UPPER = 5.0
 
+# Shearing
+SHEAR_RANGE = 7
+
 
 def change_brightness(image):
     percent_change = random.uniform(BRIGHTNESS_PERCENT_LOWER, BRIGHTNESS_PERCENT_HIGHER)
@@ -70,8 +73,18 @@ def apply_all_transforms(image):
     translation_y = np.random.uniform(TRANSLATION_Y_LOWER, TRANSLATION_Y_UPPER)
     translation_matrix = np.float32([[1, 0, translation_x], [0, 1, translation_y]])
 
+    pts1 = np.float32([[5, 5], [20, 5], [5, 20]])
+    pt1 = 5 + SHEAR_RANGE * np.random.uniform() - SHEAR_RANGE / 2
+    pt2 = 20 + SHEAR_RANGE * np.random.uniform() - SHEAR_RANGE / 2
+    pts2 = np.float32([[pt1, 5], [pt2, pt1], [5, pt2]])
+    shear_matrix = cv2.getAffineTransform(pts1, pts2)
+
     image = cv2.warpAffine(image, rotation_matrix, (columns, rows))
     image = cv2.warpAffine(image, translation_matrix, (columns, rows))
+
+    # 25% probability of shearing
+    if random.randint(1, 4) == 1:
+        image = cv2.warpAffine(image, shear_matrix, (columns, rows))
 
     return image
 
