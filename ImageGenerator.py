@@ -1,3 +1,4 @@
+import datetime
 import os
 import random
 import time
@@ -89,7 +90,10 @@ def apply_all_transforms(image):
     return image
 
 
-def generate(amount_per_image, directory=None):
+PROJECT_PATH = "/Users/mateuszdziubek/Desktop/BeerAI-Data"
+
+
+def generate(amount_per_image, directory):
     images = []
     for image_name in os.listdir(directory):
         image_name = image_name.lower()
@@ -99,9 +103,38 @@ def generate(amount_per_image, directory=None):
 
     for image in images:
         for _ in range(amount_per_image):
-            if directory is not None:
-                generated_image = apply_all_transforms(mpimg.imread(f"{directory}/{image}"))
-                scipy.misc.toimage(generated_image).save(f"{directory}/generated{time.time()}.jpg")
-            else:
-                generated_image = apply_all_transforms(mpimg.imread(image))
-                scipy.misc.toimage(generated_image).save(f"generated{time.time()}.jpg")
+            generated_image = apply_all_transforms(mpimg.imread(f"{directory}/{image}"))
+            scipy.misc.toimage(generated_image).save(f"{directory}/generated{time.time()}.jpg")
+
+
+def generate_for_all(amount_per_image, container_directory):
+    for folder_name in os.listdir(container_directory):
+        if not folder_name.startswith("."):
+            generate(amount_per_image, f"{container_directory}/{folder_name}")
+
+
+def save_labels(container_directory):
+    labels = []
+    for folder_name in os.listdir(container_directory):
+        if not folder_name.startswith("."):
+            labels.append(folder_name)
+    file_path = f"{PROJECT_PATH}/data/labels/{str(datetime.datetime.now())}.txt"
+    file = open(file_path, 'w')
+    for label in labels:
+        file.write("%s\n" % label)
+
+
+save_labels(f"{PROJECT_PATH}/data/train")
+
+# generate_for_all(150, f"{PROJECT_PATH}/data/train")
+
+# generate(150, f"{PROJECT_PATH}/data/train/001harnas")
+# generate(150, f"{PROJECT_PATH}/data/train/002kasztelan_niepaster")
+# generate(150, f"{PROJECT_PATH}/data/train/003kasztelan_pszen")
+# generate(150, f"{PROJECT_PATH}/data/train/004miloslaw_nieb")
+# generate(150, f"{PROJECT_PATH}/data/train/005perla_chmiel")
+# generate(150, f"{PROJECT_PATH}/data/train/006perla_export")
+# generate(150, f"{PROJECT_PATH}/data/train/007somersby")
+# generate(150, f"{PROJECT_PATH}/data/train/008warka")
+# generate(150, f"{PROJECT_PATH}/data/train/009wojak")
+# generate(150, f"{PROJECT_PATH}/data/train/010zywiec_bialy")
